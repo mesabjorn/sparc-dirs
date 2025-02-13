@@ -1,5 +1,6 @@
 from pathlib import Path
 import argparse
+from src import await_input, logger
 
 from src.sparc import convert_to_sparc
 
@@ -22,14 +23,24 @@ def parse_cli_args():
         default=Path("./sparc_data"),
         help="Path to the output SPARC directory.",
     )
+    parser.add_argument(
+        "--outputfile",
+        type=Path,
+        default=Path("result.csv"),
+        help="Output database of moved files",
+    )
 
     return parser.parse_args()
 
 
 def main():
     args = parse_cli_args()
-    shutil.rmtree(args.sparc_base_dir)
-    convert_to_sparc(args.generic_data_dir, args.sparc_base_dir)
+    source_path,target_path = args.generic_data_dir,args.sparc_base_dir
+    if target_path.exists():
+        answer = await_input(f"{target_path} already exists? Delete (y/n)?", allow=["y","n"])
+        if answer == "y":
+            shutil.rmtree(args.sparc_base_dir)
+    convert_to_sparc(source_path, target_path, outputfile = args.outputfile)
 
 
 if __name__ == "__main__":

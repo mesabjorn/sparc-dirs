@@ -78,6 +78,7 @@ def move_files_to_sparc(
                 shutil.copy(str(file), str(dest_path))
                 logger.info(f"Moved {file.name} to {dest_path}/")
         subcount += 1
+    "return result rows as a pandas dataframe"
     df = pd.DataFrame(
         rows,
         columns=["target_location", "original_location", "filename", "n_files"],
@@ -116,25 +117,25 @@ def generate_sam(sparc_path: Path, df: pd.DataFrame):
         if target_location.exists() and target_location.is_dir():
             new_location = target_location.parent / samname
             target_location.rename(new_location)
-            sam_mapping[d] = samname  # Map original to new name
+            sam_mapping[d] = new_location  # Map original to new name
         else:
             sam_mapping[d] = None  # Preserve structure even if path doesn't exist
         samcounter += 1
     # Assign correct sam_name to each row based on target_location
-    df["sam_name"] = df["target_location"].map(sam_mapping)
+    df["target_location"] = df["target_location"].map(sam_mapping)
     return df
 
 
 def convert_to_sparc(
-    generic_data_dir: Union[str, Path], sparc_base_dir: Union[str, Path]
+    generic_data_dir: Union[str, Path], sparc_base_dir: Union[str, Path],outputfile:str|Path
 ) -> None:
     """Converts a generic data directory into SPARC format."""
     create_sparc_directories(sparc_base_dir)
     df = move_files_to_sparc(generic_data_dir, sparc_base_dir)
-    filename = "result.csv"
+    
     df = generate_sam(sparc_base_dir, df)
-    df.to_csv(filename, encoding="utf-8", index=False)
-    logger.info(f"created csv file: {filename}")
+    df.to_csv(outputfile, encoding="utf-8", index=False)
+    logger.info(f"created csv file: {outputfile}")
 
     create_dataset_description(sparc_base_dir)
     logger.info("Conversion to SPARC format complete.")

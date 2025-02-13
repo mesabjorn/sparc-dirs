@@ -29,3 +29,20 @@ def get_logger():
 
 
 logger = get_logger()
+
+
+def await_input(prompt:str,allow:list[str]=[])->str:
+    """_summary_
+
+    Args:
+        prompt (str): question to ask user
+        allow (list[str], optional): Allowed string as answer (case-insensitive). Defaults to [].
+
+    Returns:
+        str: _description_
+    """
+    while True:
+        answer = input(prompt).strip().lower()
+        if answer in allow or len(allow)==0:
+            return answer
+        logger.info(f"Invalid prompt, must be one of {allow}")
