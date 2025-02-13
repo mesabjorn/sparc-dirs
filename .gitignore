@@ -1,3 +1,8 @@
+result.csv
+.vscode/
+sparc_data/
+*.dcm
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
